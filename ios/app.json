@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "MIDI to Notation",
+    "slug": "midi-to-notation",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "scheme": "midi-to-notation",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chansoosong.midi-to-notation",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Record audio for pitch detection and MIDI conversion",
+        "NSBluetoothAlwaysUsageDescription": "Connect to Bluetooth MIDI devices like Yamaha YDS-150",
+        "NSBluetoothPeripheralUsageDescription": "Connect to Bluetooth MIDI devices",
+        "UIBackgroundModes": ["audio"]
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Record audio for pitch detection and MIDI conversion"
+        }
+      ]
+    ],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+ios/ios/
+ios/build/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+web-build/
