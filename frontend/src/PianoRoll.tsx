@@ -88,11 +88,11 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
     c.style.height = H + "px";
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = "#1e1e1e";
+    ctx.fillStyle = "#2c2c2c";
     ctx.fillRect(0, 0, W, H);
 
     for (let p = minP; p <= maxP; p++) {
-      ctx.fillStyle = isNat(p) ? "#262626" : "#1a1a1a";
+      ctx.fillStyle = isNat(p) ? "#333333" : "#282828";
       ctx.fillRect(LABEL_W, pToY(p), W - LABEL_W, ROW_H);
     }
 
@@ -119,7 +119,7 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       ctx.stroke();
     }
 
-    ctx.fillStyle = "#2a2a2a";
+    ctx.fillStyle = "#383838";
     ctx.fillRect(0, 0, W, HEADER_H);
     ctx.font = "10px 'SF Mono', Menlo, monospace";
     ctx.textAlign = "center";
@@ -129,7 +129,7 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       ctx.fillText(String(m), tToX(q) + (quartersPerMeasure * pxQ) / 2, 18);
     }
 
-    ctx.fillStyle = "#222222";
+    ctx.fillStyle = "#303030";
     ctx.fillRect(0, HEADER_H, LABEL_W, H - HEADER_H);
     ctx.textAlign = "right";
     ctx.font = "10px 'SF Mono', Menlo, monospace";
@@ -328,7 +328,7 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
   };
 
   const tb: React.CSSProperties = {
-    background: "#2e2e2e", color: "#aaa", border: "1px solid #3a3a3a",
+    background: "#fff", color: "#444", border: "1px solid #c0c0c0",
     borderRadius: 2, padding: "2px 8px", cursor: "pointer", fontSize: 10,
     fontWeight: 600, letterSpacing: "0.5px",
   };
@@ -337,20 +337,20 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
     <div>
       <div style={{
         display: "flex", gap: 6, alignItems: "center",
-        padding: "4px 12px", background: "#2a2a2a", borderBottom: "1px solid #3a3a3a",
+        padding: "4px 12px", background: "#d8d8d8", borderBottom: "1px solid #c0c0c0",
       }}>
         <button onClick={() => setZoom((z) => Math.min(4, z + 0.25))} style={tb}>+</button>
         <button onClick={() => setZoom((z) => Math.max(0.3, z - 0.25))} style={tb}>−</button>
-        <span style={{ fontSize: 10, color: "#666", minWidth: 32, fontFamily: "monospace" }}>{Math.round(zoom * 100)}%</span>
+        <span style={{ fontSize: 10, color: "#888", minWidth: 32, fontFamily: "monospace" }}>{Math.round(zoom * 100)}%</span>
 
         {selected.size > 0 && (
           <>
-            <div style={{ width: 1, height: 16, background: "#3a3a3a" }} />
+            <div style={{ width: 1, height: 16, background: "#c0c0c0" }} />
             <button onClick={handleSnapSelected} style={tb}>SNAP TO GRID</button>
           </>
         )}
 
-        <span style={{ fontSize: 9, color: "#555", marginLeft: "auto", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+        <span style={{ fontSize: 9, color: "#999", marginLeft: "auto", letterSpacing: "0.5px", textTransform: "uppercase" }}>
           {selected.size > 0
             ? `${selected.size} sel · del to remove`
             : "click · lasso · ctrl+scroll zoom"}

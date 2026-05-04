@@ -1,25 +1,24 @@
 :root {
-  --bg: #1a1a1a;
-  --surface: #242424;
-  --surface-2: #2e2e2e;
-  --surface-3: #383838;
-  --toolbar: #2a2a2a;
-  --border: #3a3a3a;
-  --border-light: #4a4a4a;
-  --text: #c8c8c8;
-  --text-muted: #808080;
-  --text-dim: #585858;
-  --accent: #5aac6e;
-  --accent-hover: #6bc47e;
+  --bg: #e8e8e8;
+  --surface: #f2f2f2;
+  --surface-2: #ffffff;
+  --surface-3: #fafafa;
+  --toolbar: #d8d8d8;
+  --border: #c0c0c0;
+  --border-light: #b0b0b0;
+  --text: #2a2a2a;
+  --text-muted: #707070;
+  --text-dim: #999999;
+  --accent: #4a8c5c;
+  --accent-hover: #3d7a4e;
   --record: #cc3333;
-  --record-glow: rgba(204, 51, 51, 0.4);
-  --stop: #cccccc;
-  --armed: #cc3333;
+  --record-glow: rgba(204, 51, 51, 0.3);
+  --stop: #444444;
   --selected: #d4943a;
-  --meter-green: #4caf50;
-  --meter-yellow: #f5a623;
+  --meter-green: #4a8c5c;
+  --meter-yellow: #c49000;
   --meter-red: #cc3333;
-  --purple: #8b5cf6;
+  --purple: #7c5cbf;
   --radius: 3px;
   --radius-lg: 4px;
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
@@ -46,14 +45,14 @@ body {
   align-items: center;
   gap: 10px;
   padding: 6px 16px;
-  background: linear-gradient(180deg, #333 0%, #282828 100%);
-  border-bottom: 1px solid #444;
+  background: linear-gradient(180deg, #e0e0e0 0%, #d0d0d0 100%);
+  border-bottom: 1px solid var(--border);
 }
 
 .app-header h1 {
   font-size: 14px;
-  font-weight: 600;
-  color: #e0e0e0;
+  font-weight: 700;
+  color: #333;
   letter-spacing: 0.5px;
 }
 
@@ -95,7 +94,7 @@ body {
   padding: 1px 6px;
   border-radius: 2px;
   background: var(--accent);
-  color: #111;
+  color: #fff;
   font-weight: 700;
   font-family: "SF Mono", "Menlo", monospace;
 }
@@ -109,7 +108,7 @@ body {
 
 label {
   font-size: 9px;
-  color: var(--text-dim);
+  color: var(--text-muted);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -133,7 +132,7 @@ select, input[type="number"], input[type="text"] {
   padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #1a1a1a;
+  background: var(--surface-2);
   color: var(--text);
   font-size: 11px;
   font-family: "SF Mono", "Menlo", monospace;
@@ -149,7 +148,7 @@ select:focus, input:focus {
 select {
   -webkit-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23808080' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23999999' stroke-width='1.2'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 6px center;
   padding-right: 20px;
@@ -189,17 +188,17 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: var(--surface-3);
+  background: var(--toolbar);
   border-color: var(--border-light);
 }
 
 button:active:not(:disabled) {
-  background: #444;
+  background: #c8c8c8;
 }
 
 button.primary {
   background: var(--accent);
-  color: #111;
+  color: #fff;
   border-color: var(--accent);
   font-weight: 700;
   padding: 6px 16px;
@@ -271,7 +270,7 @@ button:disabled {
 }
 
 .score {
-  background: #f5f5f0;
+  background: #ffffff;
   padding: 16px;
   border-radius: var(--radius);
   min-height: 180px;
@@ -282,8 +281,8 @@ button:disabled {
 /* ── Error ── */
 .error {
   color: var(--record);
-  background: rgba(204, 51, 51, 0.1);
-  border: 1px solid rgba(204, 51, 51, 0.25);
+  background: rgba(204, 51, 51, 0.08);
+  border: 1px solid rgba(204, 51, 51, 0.2);
   padding: 6px 10px;
   border-radius: var(--radius);
   font-size: 11px;
