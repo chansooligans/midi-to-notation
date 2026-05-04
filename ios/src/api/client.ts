@@ -1,6 +1,6 @@
 import { ExportRequest, AudioConvertResponse, QuantizeResponse, PRNote, NoteEvent } from "./types";
 
-let BASE_URL = "http://192.168.1.167:8000";
+let BASE_URL = "https://midi-to-notation.onrender.com";
 
 export function setBaseUrl(url: string) {
   BASE_URL = url.replace(/\/+$/, "");
