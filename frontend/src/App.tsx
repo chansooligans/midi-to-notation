@@ -5,7 +5,7 @@ import { PianoRoll, PRNote } from "./PianoRoll";
 
 type Phase = "idle" | "recording" | "recording-audio" | "stopped";
 
-const API = import.meta.env.PROD ? "https://midi-to-notation-api.onrender.com" : "";
+const API = import.meta.env.PROD ? "https://midi-to-notation.onrender.com" : "";
 
 const GRID_OPTIONS = [
   { label: "Quarter", value: "1", snap: 1.0 },
