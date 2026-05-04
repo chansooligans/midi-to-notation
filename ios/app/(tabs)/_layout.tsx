@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
 
-function TabIcon({ symbol, label, focused }: { symbol: string; label: string; focused: boolean }) {
+function TabIcon({ symbol, focused }: { symbol: string; focused: boolean }) {
   return (
     <View style={ti.wrap}>
       <Text style={[ti.icon, focused && ti.iconActive]}>{symbol}</Text>
@@ -11,8 +11,8 @@ function TabIcon({ symbol, label, focused }: { symbol: string; label: string; fo
 
 const ti = StyleSheet.create({
   wrap: { alignItems: "center", paddingTop: 4 },
-  icon: { fontSize: 20, color: "#555577" },
-  iconActive: { color: "#4a9eff" },
+  icon: { fontSize: 18, color: "#585858" },
+  iconActive: { color: "#5aac6e" },
 });
 
 export default function TabLayout() {
@@ -20,46 +20,50 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: "#12122a",
+          backgroundColor: "#2a2a2a",
           shadowColor: "transparent",
           elevation: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: "#3a3a3a",
         },
-        headerTintColor: "#e8e8f0",
+        headerTintColor: "#c8c8c8",
         headerTitleStyle: {
-          fontWeight: "600",
-          fontSize: 17,
-          letterSpacing: -0.3,
+          fontWeight: "700",
+          fontSize: 13,
+          letterSpacing: 1,
+          textTransform: "uppercase",
         },
         tabBarStyle: {
-          backgroundColor: "#12122a",
-          borderTopColor: "#222244",
-          borderTopWidth: 0.5,
-          height: 84,
-          paddingBottom: 28,
-          paddingTop: 8,
+          backgroundColor: "#2a2a2a",
+          borderTopColor: "#3a3a3a",
+          borderTopWidth: 1,
+          height: 80,
+          paddingBottom: 26,
+          paddingTop: 6,
         },
-        tabBarActiveTintColor: "#4a9eff",
-        tabBarInactiveTintColor: "#555577",
+        tabBarActiveTintColor: "#5aac6e",
+        tabBarInactiveTintColor: "#585858",
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: "600",
-          letterSpacing: 0.5,
+          fontSize: 9,
+          fontWeight: "700",
+          letterSpacing: 1,
+          textTransform: "uppercase",
         },
       }}
     >
       <Tabs.Screen
         name="record"
         options={{
-          title: "Record",
-          tabBarIcon: ({ focused }) => <TabIcon symbol="●" label="Record" focused={focused} />,
-          headerTitle: "MIDI to Notation",
+          title: "Rec",
+          tabBarIcon: ({ focused }) => <TabIcon symbol="●" focused={focused} />,
+          headerTitle: "MIDI → Notation",
         }}
       />
       <Tabs.Screen
         name="editor"
         options={{
-          title: "Editor",
-          tabBarIcon: ({ focused }) => <TabIcon symbol="♫" label="Editor" focused={focused} />,
+          title: "Edit",
+          tabBarIcon: ({ focused }) => <TabIcon symbol="♫" focused={focused} />,
           headerTitle: "Piano Roll",
         }}
       />
@@ -67,16 +71,16 @@ export default function TabLayout() {
         name="notation"
         options={{
           title: "Score",
-          tabBarIcon: ({ focused }) => <TabIcon symbol="𝄞" label="Score" focused={focused} />,
-          headerTitle: "Notation",
+          tabBarIcon: ({ focused }) => <TabIcon symbol="𝄞" focused={focused} />,
+          headerTitle: "Score",
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
-          tabBarIcon: ({ focused }) => <TabIcon symbol="⚙" label="Settings" focused={focused} />,
-          headerTitle: "Settings",
+          title: "Setup",
+          tabBarIcon: ({ focused }) => <TabIcon symbol="⚙" focused={focused} />,
+          headerTitle: "Setup",
         }}
       />
     </Tabs>

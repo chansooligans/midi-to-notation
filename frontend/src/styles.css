@@ -1,21 +1,28 @@
 :root {
-  --bg: #0f0f1a;
-  --surface: #1a1a2e;
-  --surface-2: #222240;
-  --surface-3: #2a2a4a;
-  --border: #333355;
-  --text: #e8e8f0;
-  --text-muted: #8888aa;
-  --text-dim: #555577;
-  --accent: #4a9eff;
-  --accent-hover: #5aadff;
-  --danger: #e74c3c;
-  --success: #2ecc71;
-  --purple: #7c3aed;
-  --orange: #f59e0b;
-  --radius: 10px;
-  --radius-lg: 14px;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bg: #1a1a1a;
+  --surface: #242424;
+  --surface-2: #2e2e2e;
+  --surface-3: #383838;
+  --toolbar: #2a2a2a;
+  --border: #3a3a3a;
+  --border-light: #4a4a4a;
+  --text: #c8c8c8;
+  --text-muted: #808080;
+  --text-dim: #585858;
+  --accent: #5aac6e;
+  --accent-hover: #6bc47e;
+  --record: #cc3333;
+  --record-glow: rgba(204, 51, 51, 0.4);
+  --stop: #cccccc;
+  --armed: #cc3333;
+  --selected: #d4943a;
+  --meter-green: #4caf50;
+  --meter-yellow: #f5a623;
+  --meter-red: #cc3333;
+  --purple: #8b5cf6;
+  --radius: 3px;
+  --radius-lg: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,88 +31,91 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  font-size: 12px;
 }
 
 .app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 24px 40px;
+  padding: 0;
 }
 
-/* Header */
+/* ── Top bar ── */
 .app-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  padding: 6px 16px;
+  background: linear-gradient(180deg, #333 0%, #282828 100%);
+  border-bottom: 1px solid #444;
 }
 
 .app-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--accent), #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e0;
+  letter-spacing: 0.5px;
 }
 
 .app-header .subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
   margin-left: auto;
+  font-family: "SF Mono", "Menlo", monospace;
 }
 
-/* Panels */
+/* ── Panels ── */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 16px 20px;
-  margin-bottom: 14px;
+  padding: 10px 14px;
+  margin: 8px 10px;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
 }
 
 .panel-header h3 {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.5px;
   color: var(--text-muted);
 }
 
 .panel-header .badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 2px;
   background: var(--accent);
-  color: white;
-  font-weight: 600;
+  color: #111;
+  font-weight: 700;
+  font-family: "SF Mono", "Menlo", monospace;
 }
 
-/* Controls row */
+/* ── Controls grid (channel strip style) ── */
 .controls-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
 }
 
 label {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 9px;
+  color: var(--text-dim);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 500;
+  letter-spacing: 1.2px;
+  font-weight: 700;
 }
 
 label.inline {
@@ -113,71 +123,89 @@ label.inline {
   align-items: center;
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text);
   cursor: pointer;
+  font-weight: 500;
 }
 
 select, input[type="number"], input[type="text"] {
-  padding: 8px 10px;
+  padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--surface-2);
+  background: #1a1a1a;
   color: var(--text);
-  font-size: 14px;
+  font-size: 11px;
+  font-family: "SF Mono", "Menlo", monospace;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.1s;
 }
 
 select:focus, input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23808080' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: 20px;
 }
 
 input[type="range"] {
   accent-color: var(--accent);
-  height: 4px;
+  height: 3px;
 }
 
 input[type="checkbox"] {
   accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   cursor: pointer;
 }
 
-/* Buttons */
+/* ── Buttons (transport style) ── */
 .row {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
   flex-wrap: wrap;
 }
 
 button {
-  padding: 9px 16px;
+  padding: 5px 12px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
-  transition: all 0.15s;
+  transition: all 0.1s;
   white-space: nowrap;
 }
 
 button:hover:not(:disabled) {
   background: var(--surface-3);
-  border-color: var(--text-dim);
+  border-color: var(--border-light);
+}
+
+button:active:not(:disabled) {
+  background: #444;
 }
 
 button.primary {
   background: var(--accent);
-  color: white;
+  color: #111;
   border-color: var(--accent);
-  font-weight: 600;
-  padding: 10px 20px;
-  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 button.primary:hover:not(:disabled) {
@@ -186,74 +214,97 @@ button.primary:hover:not(:disabled) {
 }
 
 button.danger {
-  background: var(--danger);
+  background: var(--record);
   color: white;
-  border-color: var(--danger);
-  font-weight: 600;
-  padding: 10px 20px;
-  font-size: 14px;
-  animation: pulse-red 1.5s ease-in-out infinite;
+  border-color: var(--record);
+  font-weight: 700;
+  padding: 6px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: rec-blink 1s step-end infinite;
 }
 
-@keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+@keyframes rec-blink {
+  0%, 100% { box-shadow: 0 0 8px var(--record-glow); }
+  50% { box-shadow: 0 0 2px var(--record-glow); }
 }
 
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .divider {
   width: 1px;
-  height: 28px;
+  height: 22px;
   background: var(--border);
   flex-shrink: 0;
 }
 
-/* Status */
+/* ── Transport status ── */
 .status {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text-muted);
   margin-left: auto;
+  font-family: "SF Mono", "Menlo", monospace;
 }
 
 .status.recording {
-  color: var(--danger);
-  font-weight: 600;
+  color: var(--record);
+  font-weight: 700;
+  animation: status-blink 1s step-end infinite;
 }
 
-/* Score */
+@keyframes status-blink {
+  50% { opacity: 0.5; }
+}
+
+/* ── Score ── */
 .score-panel h3 {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.5px;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .score {
-  background: #ffffff;
-  padding: 20px;
+  background: #f5f5f0;
+  padding: 16px;
   border-radius: var(--radius);
-  min-height: 200px;
+  min-height: 180px;
   overflow-x: auto;
+  border: 1px solid var(--border);
 }
 
-/* Error */
+/* ── Error ── */
 .error {
-  color: var(--danger);
-  background: rgba(231, 76, 60, 0.1);
-  border: 1px solid rgba(231, 76, 60, 0.2);
-  padding: 10px 14px;
+  color: var(--record);
+  background: rgba(204, 51, 51, 0.1);
+  border: 1px solid rgba(204, 51, 51, 0.25);
+  padding: 6px 10px;
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 11px;
+  font-family: "SF Mono", "Menlo", monospace;
 }
 
-/* Piano roll container */
+/* ── Piano roll ── */
 .piano-roll-container {
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
+
+/* ── LED indicators ── */
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+}
+.led.on { background: var(--meter-green); box-shadow: 0 0 4px var(--meter-green); }
+.led.armed { background: var(--record); box-shadow: 0 0 4px var(--record-glow); }
+.led.warn { background: var(--meter-yellow); box-shadow: 0 0 4px var(--meter-yellow); }

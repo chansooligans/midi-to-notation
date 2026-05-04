@@ -171,9 +171,9 @@ export default function RecordScreen() {
           step={5}
           value={settings.debounceMs}
           onValueChange={(v: number) => updateSettings({ debounceMs: v })}
-          minimumTrackTintColor="#4a9eff"
+          minimumTrackTintColor="#5aac6e"
           maximumTrackTintColor="#444"
-          thumbTintColor="#4a9eff"
+          thumbTintColor="#5aac6e"
         />
       </Section>
 
@@ -183,7 +183,7 @@ export default function RecordScreen() {
           <Switch
             value={settings.metronomeOn}
             onValueChange={(v) => updateSettings({ metronomeOn: v })}
-            trackColor={{ true: "#4a9eff", false: "#444" }}
+            trackColor={{ true: "#5aac6e", false: "#3a3a3a" }}
           />
           <Text style={s.label}>Metronome</Text>
         </View>
@@ -195,9 +195,9 @@ export default function RecordScreen() {
             step={0.05}
             value={settings.metronomeVol}
             onValueChange={(v: number) => updateSettings({ metronomeVol: v })}
-            minimumTrackTintColor="#4a9eff"
+            minimumTrackTintColor="#5aac6e"
             maximumTrackTintColor="#444"
-            thumbTintColor="#4a9eff"
+            thumbTintColor="#5aac6e"
           />
         )}
       </Section>
@@ -211,8 +211,8 @@ export default function RecordScreen() {
             <RecordButton isRecording label="Stop Audio" onPress={stopAudio} />
           ) : (
             <>
-              <RecordButton isRecording={false} label="Record MIDI" onPress={startMidi} color="#4a9eff" />
-              <RecordButton isRecording={false} label="Record Audio" onPress={startAudio} color="#e67e22" />
+              <RecordButton isRecording={false} label="REC MIDI" onPress={startMidi} color="#5aac6e" />
+              <RecordButton isRecording={false} label="REC AUDIO" onPress={startAudio} color="#d4943a" />
               <TouchableOpacity style={s.uploadBtn} onPress={pickAudioFile}>
                 <Text style={s.uploadBtnText}>Upload Audio File</Text>
               </TouchableOpacity>
@@ -240,37 +240,42 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1a1a2e" },
-  content: { padding: 16 },
+  container: { flex: 1, backgroundColor: "#1a1a1a" },
+  content: { padding: 12 },
   section: {
-    marginBottom: 20,
-    padding: 16,
-    backgroundColor: "#222240",
-    borderRadius: 12,
+    marginBottom: 12,
+    padding: 14,
+    backgroundColor: "#242424",
+    borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: "#3a3a3a",
   },
-  sectionTitle: { color: "#aaa", fontSize: 13, fontWeight: "600", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 },
+  sectionTitle: {
+    color: "#808080", fontSize: 9, fontWeight: "700", marginBottom: 10,
+    textTransform: "uppercase", letterSpacing: 1.5,
+    borderBottomWidth: 1, borderBottomColor: "#3a3a3a", paddingBottom: 6,
+  },
   row: { flexDirection: "row", alignItems: "center", gap: 10 },
-  label: { color: "#ccc", fontSize: 14 },
-  hint: { color: "#666", fontSize: 13, marginTop: 8 },
-  deviceName: { color: "#4a9eff", fontSize: 14, marginTop: 4 },
+  label: { color: "#aaa", fontSize: 12 },
+  hint: { color: "#585858", fontSize: 11, marginTop: 8, fontFamily: "Menlo" },
+  deviceName: { color: "#5aac6e", fontSize: 12, marginTop: 4, fontFamily: "Menlo" },
   smallBtn: {
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8,
-    backgroundColor: "#333", marginBottom: 8,
+    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 3,
+    backgroundColor: "#2e2e2e", marginBottom: 6,
+    borderWidth: 1, borderColor: "#3a3a3a",
   },
-  smallBtnText: { color: "#ccc", fontSize: 14 },
+  smallBtnText: { color: "#aaa", fontSize: 11, fontWeight: "600", letterSpacing: 0.5 },
   uploadBtn: {
-    paddingHorizontal: 20, paddingVertical: 14, borderRadius: 10,
-    backgroundColor: "#2a2a40", borderWidth: 1, borderColor: "#444",
+    paddingHorizontal: 16, paddingVertical: 12, borderRadius: 3,
+    backgroundColor: "#2e2e2e", borderWidth: 1, borderColor: "#3a3a3a",
     alignItems: "center",
   },
-  uploadBtnText: { color: "#ccc", fontSize: 16 },
+  uploadBtnText: { color: "#aaa", fontSize: 11, fontWeight: "600", letterSpacing: 0.5, textTransform: "uppercase" },
   banner: {
-    padding: 10, backgroundColor: "#e74c3c33", borderRadius: 8,
-    marginBottom: 16, borderWidth: 1, borderColor: "#e74c3c55",
+    padding: 8, backgroundColor: "rgba(204,51,51,0.1)", borderRadius: 3,
+    marginBottom: 12, borderWidth: 1, borderColor: "rgba(204,51,51,0.25)",
   },
-  bannerText: { color: "#e74c3c", fontSize: 13, textAlign: "center" },
-  status: { color: "#4a9eff", textAlign: "center", marginTop: 16, fontSize: 14 },
-  errorText: { color: "#e74c3c", textAlign: "center", marginTop: 8, fontSize: 13 },
+  bannerText: { color: "#cc3333", fontSize: 11, textAlign: "center", fontFamily: "Menlo" },
+  status: { color: "#5aac6e", textAlign: "center", marginTop: 12, fontSize: 11, fontFamily: "Menlo" },
+  errorText: { color: "#cc3333", textAlign: "center", marginTop: 8, fontSize: 11, fontFamily: "Menlo" },
 });

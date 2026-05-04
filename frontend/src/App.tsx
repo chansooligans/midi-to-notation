@@ -309,31 +309,78 @@ export function App() {
 
   return (
     <div className="app">
+      {/* ── Top bar ── */}
       <div className="app-header">
         <h1>MIDI → Notation</h1>
-        <span className="subtitle">Yamaha YDS-150</span>
+        <span className="subtitle">YDS-150</span>
       </div>
 
+      {/* ── Transport bar ── */}
+      <div className="panel" style={{ margin: "0 10px 0", borderRadius: 0, borderTop: "none", padding: "8px 14px" }}>
+        <div className="row">
+          {phase !== "recording" && phase !== "recording-audio" ? (
+            <>
+              <button className="primary" onClick={startRecording} disabled={busy || devices.length === 0}>
+                ● REC MIDI
+              </button>
+              <button className="primary" onClick={startAudioRecording} disabled={busy} style={{ background: "var(--purple)", borderColor: "var(--purple)" }}>
+                ● REC AUDIO
+              </button>
+              <button onClick={() => fileInputRef.current?.click()} disabled={busy}>
+                ↑ IMPORT
+              </button>
+              <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileUpload} style={{ display: "none" }} />
+            </>
+          ) : phase === "recording" ? (
+            <button className="danger" onClick={stopRecording} disabled={busy}>
+              ■ STOP
+            </button>
+          ) : (
+            <button className="danger" onClick={stopAudioRecording} disabled={busy}>
+              ■ STOP
+            </button>
+          )}
+
+          <div className="divider" />
+
+          <button onClick={() => downloadFile("musicxml")} disabled={phase !== "stopped" || busy}>
+            EXPORT XML
+          </button>
+          <button onClick={() => downloadFile("pdf")} disabled={phase !== "stopped" || busy}>
+            EXPORT PDF
+          </button>
+
+          <span className={`status ${phase === "recording" || phase === "recording-audio" ? "recording" : ""}`}>
+            {phase === "idle" && "IDLE"}
+            {phase === "recording" && "● REC"}
+            {phase === "recording-audio" && "● REC AUDIO"}
+            {phase === "stopped" && noteCount !== null && `${noteCount} NOTES`}
+          </span>
+        </div>
+        {error && <div className="error" style={{ marginTop: 8 }}>{error}</div>}
+      </div>
+
+      {/* ── Channel strip / settings ── */}
       <div className="panel">
         <div className="panel-header">
-          <h3>Settings</h3>
+          <h3>Session</h3>
         </div>
         <div className="controls-grid">
           <label>
-            MIDI Input
-            <div className="row" style={{ gap: 6 }}>
+            INPUT
+            <div className="row" style={{ gap: 4 }}>
               <select value={device} onChange={(e) => setDevice(e.target.value)} style={{ flex: 1 }}>
-                {devices.length === 0 && <option value="">(none detected)</option>}
+                {devices.length === 0 && <option value="">(no device)</option>}
                 {devices.map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
-              <button onClick={refreshDevices} disabled={busy} style={{ padding: "6px 10px", fontSize: 12 }}>↻</button>
+              <button onClick={refreshDevices} disabled={busy} style={{ padding: "3px 6px", fontSize: 10 }}>↻</button>
             </div>
           </label>
 
           <label>
-            Tempo (BPM)
+            BPM
             <input
               type="number"
               min={30}
@@ -344,7 +391,7 @@ export function App() {
           </label>
 
           <label>
-            Time Signature
+            TIME SIG
             <select value={timeSig} onChange={(e) => setTimeSig(e.target.value)}>
               {["2/4", "3/4", "4/4", "6/8"].map((t) => (
                 <option key={t} value={t}>{t}</option>
@@ -353,7 +400,7 @@ export function App() {
           </label>
 
           <label>
-            Transposition
+            TRANSPOSE
             <select value={transposition} onChange={(e) => setTransposition(e.target.value)}>
               {transpositions.map((t) => (
                 <option key={t} value={t}>{t}</option>
@@ -362,7 +409,7 @@ export function App() {
           </label>
 
           <label>
-            Quantize
+            QUANTIZE
             <select value={gridKey} onChange={(e) => handleRequantize(e.target.value)}>
               {GRID_OPTIONS.map((g) => (
                 <option key={g.value} value={g.value}>{g.label}</option>
@@ -371,7 +418,7 @@ export function App() {
           </label>
 
           <label>
-            Title
+            TITLE
             <input
               type="text"
               value={title}
@@ -380,92 +427,49 @@ export function App() {
           </label>
         </div>
 
-        <div className="row" style={{ marginTop: 14, gap: 20 }}>
+        <div className="row" style={{ marginTop: 10, gap: 16 }}>
           <label className="inline">
             <input type="checkbox" checked={metroOn} onChange={(e) => setMetroOn(e.target.checked)} />
-            Metronome
+            CLICK
           </label>
 
           {metroOn && (
             <label>
-              Volume
+              VOL
               <input
                 type="range"
                 min={0}
                 max={100}
                 value={metroVol}
                 onChange={(e) => setMetroVol(parseInt(e.target.value, 10))}
-                style={{ width: 100 }}
+                style={{ width: 80 }}
               />
             </label>
           )}
 
           <label className="inline">
             <input type="checkbox" checked={countIn} onChange={(e) => setCountIn(e.target.checked)} />
-            Count-in
+            COUNT-IN
           </label>
 
           <label>
-            Sensitivity
-            <div className="row" style={{ gap: 6 }}>
+            GATE
+            <div className="row" style={{ gap: 4 }}>
               <input
                 type="range"
                 min={0}
                 max={200}
                 value={debounceMs}
                 onChange={(e) => setDebounceMs(parseInt(e.target.value, 10))}
-                style={{ width: 100 }}
+                style={{ width: 80 }}
               />
-              <span style={{ fontSize: 11, color: "var(--text-dim)", minWidth: 36 }}>{debounceMs}ms</span>
+              <span style={{ fontSize: 10, color: "var(--text-dim)", minWidth: 32, fontFamily: "monospace" }}>{debounceMs}ms</span>
             </div>
           </label>
         </div>
       </div>
 
-      <div className="panel">
-        <div className="row">
-          {phase !== "recording" && phase !== "recording-audio" ? (
-            <>
-              <button className="primary" onClick={startRecording} disabled={busy || devices.length === 0}>
-                Record MIDI
-              </button>
-              <button className="primary" onClick={startAudioRecording} disabled={busy} style={{ background: "var(--purple)", borderColor: "var(--purple)" }}>
-                Record Audio
-              </button>
-              <button onClick={() => fileInputRef.current?.click()} disabled={busy}>
-                Upload Audio
-              </button>
-              <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileUpload} style={{ display: "none" }} />
-            </>
-          ) : phase === "recording" ? (
-            <button className="danger" onClick={stopRecording} disabled={busy}>
-              Stop MIDI
-            </button>
-          ) : (
-            <button className="danger" onClick={stopAudioRecording} disabled={busy}>
-              Stop Audio
-            </button>
-          )}
-
-          <div className="divider" />
-
-          <button onClick={() => downloadFile("musicxml")} disabled={phase !== "stopped" || busy}>
-            MusicXML
-          </button>
-          <button onClick={() => downloadFile("pdf")} disabled={phase !== "stopped" || busy}>
-            PDF
-          </button>
-
-          <span className={`status ${phase === "recording" || phase === "recording-audio" ? "recording" : ""}`}>
-            {phase === "idle" && "Ready"}
-            {phase === "recording" && "Recording MIDI..."}
-            {phase === "recording-audio" && "Recording Audio..."}
-            {phase === "stopped" && noteCount !== null && `${noteCount} notes captured`}
-          </span>
-        </div>
-        {error && <div className="error" style={{ marginTop: 12 }}>{error}</div>}
-      </div>
-
+      {/* ── Piano roll ── */}
       {phase === "stopped" && qNotes.length > 0 && (
         <div className="panel piano-roll-container" style={{ padding: 0 }}>
           <PianoRoll
@@ -478,8 +482,9 @@ export function App() {
         </div>
       )}
 
+      {/* ── Score ── */}
       <div className="panel score-panel">
-        <h3>Notation</h3>
+        <h3>Score Output</h3>
         <div className="score" ref={scoreDivRef} />
       </div>
     </div>

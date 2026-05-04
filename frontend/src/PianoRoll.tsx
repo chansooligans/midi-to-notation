@@ -88,11 +88,11 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
     c.style.height = H + "px";
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = "#1a1a2e";
+    ctx.fillStyle = "#1e1e1e";
     ctx.fillRect(0, 0, W, H);
 
     for (let p = minP; p <= maxP; p++) {
-      ctx.fillStyle = isNat(p) ? "#1e1e36" : "#16162a";
+      ctx.fillStyle = isNat(p) ? "#262626" : "#1a1a1a";
       ctx.fillRect(LABEL_W, pToY(p), W - LABEL_W, ROW_H);
     }
 
@@ -102,7 +102,7 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       const frac = q / quartersPerMeasure;
       const isMeasure = Math.abs(frac - Math.round(frac)) < 0.001;
       const isBeat = Math.abs(q - Math.round(q)) < 0.001;
-      ctx.strokeStyle = isMeasure ? "#3a3a5a" : isBeat ? "#2a2a4a" : "#222240";
+      ctx.strokeStyle = isMeasure ? "#484848" : isBeat ? "#363636" : "#2e2e2e";
       ctx.lineWidth = isMeasure ? 1.5 : isBeat ? 1 : 0.5;
       ctx.beginPath();
       ctx.moveTo(x, HEADER_H);
@@ -111,7 +111,7 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
     }
 
     for (let p = minP; p <= maxP + 1; p++) {
-      ctx.strokeStyle = "#222240";
+      ctx.strokeStyle = "#2e2e2e";
       ctx.lineWidth = p % 12 === 0 ? 1.5 : 0.5;
       ctx.beginPath();
       ctx.moveTo(LABEL_W, pToY(p) + ROW_H);
@@ -119,22 +119,22 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       ctx.stroke();
     }
 
-    ctx.fillStyle = "#2a2a40";
+    ctx.fillStyle = "#2a2a2a";
     ctx.fillRect(0, 0, W, HEADER_H);
-    ctx.font = "12px -apple-system, sans-serif";
+    ctx.font = "10px 'SF Mono', Menlo, monospace";
     ctx.textAlign = "center";
-    ctx.fillStyle = "#aaa";
+    ctx.fillStyle = "#888";
     for (let q = 0; q < totalQ; q += quartersPerMeasure) {
       const m = Math.round(q / quartersPerMeasure) + 1;
       ctx.fillText(String(m), tToX(q) + (quartersPerMeasure * pxQ) / 2, 18);
     }
 
-    ctx.fillStyle = "#262640";
+    ctx.fillStyle = "#222222";
     ctx.fillRect(0, HEADER_H, LABEL_W, H - HEADER_H);
     ctx.textAlign = "right";
-    ctx.font = "11px monospace";
+    ctx.font = "10px 'SF Mono', Menlo, monospace";
     for (let p = minP; p <= maxP; p++) {
-      ctx.fillStyle = isNat(p) ? "#bbb" : "#666";
+      ctx.fillStyle = isNat(p) ? "#999" : "#555";
       ctx.fillText(noteName(p), LABEL_W - 6, pToY(p) + ROW_H / 2 + 4);
     }
 
@@ -144,11 +144,11 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       const w = Math.max(n.duration * pxQ, 4);
       const h = ROW_H - 2;
       const isSel = selected.has(i);
-      ctx.fillStyle = isSel ? "#ff8c42" : "#4a9eff";
+      ctx.fillStyle = isSel ? "#d4943a" : "#5aac6e";
       ctx.beginPath();
-      ctx.roundRect(x, y, w, h, 3);
+      ctx.roundRect(x, y, w, h, 2);
       ctx.fill();
-      ctx.strokeStyle = isSel ? "rgba(255,200,100,0.5)" : "rgba(0,0,0,0.3)";
+      ctx.strokeStyle = isSel ? "rgba(212,148,58,0.6)" : "rgba(0,0,0,0.4)";
       ctx.lineWidth = isSel ? 1.5 : 0.5;
       ctx.stroke();
       if (w > HANDLE_W * 3) {
@@ -163,9 +163,9 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
       const my = Math.min(marquee.y0, marquee.y1);
       const mw = Math.abs(marquee.x1 - marquee.x0);
       const mh = Math.abs(marquee.y1 - marquee.y0);
-      ctx.fillStyle = "rgba(74, 154, 255, 0.12)";
+      ctx.fillStyle = "rgba(90, 172, 110, 0.12)";
       ctx.fillRect(mx, my, mw, mh);
-      ctx.strokeStyle = "rgba(74, 154, 255, 0.6)";
+      ctx.strokeStyle = "rgba(90, 172, 110, 0.6)";
       ctx.lineWidth = 1;
       ctx.strokeRect(mx, my, mw, mh);
     }
@@ -328,32 +328,32 @@ export function PianoRoll({ notes, onChange, onEditEnd, quartersPerMeasure, grid
   };
 
   const tb: React.CSSProperties = {
-    background: "#333", color: "#ccc", border: "1px solid #444",
-    borderRadius: 4, padding: "2px 10px", cursor: "pointer", fontSize: 13,
+    background: "#2e2e2e", color: "#aaa", border: "1px solid #3a3a3a",
+    borderRadius: 2, padding: "2px 8px", cursor: "pointer", fontSize: 10,
+    fontWeight: 600, letterSpacing: "0.5px",
   };
 
   return (
     <div>
       <div style={{
-        display: "flex", gap: 8, alignItems: "center",
-        padding: "6px 16px", background: "#262640", borderBottom: "1px solid #333",
+        display: "flex", gap: 6, alignItems: "center",
+        padding: "4px 12px", background: "#2a2a2a", borderBottom: "1px solid #3a3a3a",
       }}>
         <button onClick={() => setZoom((z) => Math.min(4, z + 0.25))} style={tb}>+</button>
         <button onClick={() => setZoom((z) => Math.max(0.3, z - 0.25))} style={tb}>−</button>
-        <span style={{ fontSize: 11, color: "#888", minWidth: 36 }}>{Math.round(zoom * 100)}%</span>
+        <span style={{ fontSize: 10, color: "#666", minWidth: 32, fontFamily: "monospace" }}>{Math.round(zoom * 100)}%</span>
 
         {selected.size > 0 && (
           <>
-            <div style={{ width: 1, height: 18, background: "#444" }} />
-            <button onClick={handleSnapSelected} style={tb}>Snap Selected to Grid</button>
+            <div style={{ width: 1, height: 16, background: "#3a3a3a" }} />
+            <button onClick={handleSnapSelected} style={tb}>SNAP TO GRID</button>
           </>
         )}
 
-        <span style={{ fontSize: 11, color: "#666", marginLeft: "auto" }}>
+        <span style={{ fontSize: 9, color: "#555", marginLeft: "auto", letterSpacing: "0.5px", textTransform: "uppercase" }}>
           {selected.size > 0
-            ? `${selected.size} selected · Delete to remove`
-            : "click to select · drag empty area to lasso"}
-          {" · ctrl+scroll to zoom"}
+            ? `${selected.size} sel · del to remove`
+            : "click · lasso · ctrl+scroll zoom"}
         </span>
       </div>
       <div
