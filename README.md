@@ -2,10 +2,13 @@
 
 Record MIDI from a Yamaha YDS-150 (or any MIDI input), quantize against a metronome, and render/export musical notation.
 
+**[Web App](https://midi-to-notation-1.onrender.com)** · **[API](https://midi-to-notation.onrender.com/api/health)**
+
 ## Architecture
-- **Backend** — FastAPI + `mido` (MIDI capture) + `music21` (notation, MusicXML/PDF export)
-- **Frontend** — React + Vite, OpenSheetMusicDisplay for rendering, Web Audio metronome
-- **Flow** — Record-then-convert: hit Record (with optional count-in and click), play, hit Stop. Notes are quantized to a 16th-note grid against the chosen tempo, rendered as notation, and exportable as MusicXML or PDF.
+- **Backend** — FastAPI + `music21` (quantization, notation, MusicXML/PDF export), deployed on Render
+- **Frontend** — React + Vite, Web MIDI API for browser-based MIDI recording, OpenSheetMusicDisplay for rendering
+- **iOS** — React Native + Expo for mobile recording and score display
+- **Flow** — Record-then-convert: hit Record (with optional count-in and click), play, hit Stop. Notes are quantized to a configurable grid against the chosen tempo, rendered as notation, and exportable as MusicXML or PDF.
 
 ## Setup
 
@@ -32,11 +35,12 @@ npm run dev   # http://localhost:5173
 ```
 
 ## Usage
-1. Plug in the YDS-150 over USB.
-2. Open the frontend, pick the MIDI input device (refresh if needed).
-3. Set tempo, time signature, and transposition (default: `bb_tenor` — written for Bb tenor sax).
-4. Click **Record**. After the count-in, play. Click **Stop** when done.
-5. Notation renders inline. Download as MusicXML or PDF.
+1. Open the [web app](https://midi-to-notation-1.onrender.com) (or run locally).
+2. Connect your MIDI device (e.g. YDS-150 over USB). The browser will detect it via Web MIDI API.
+3. Pick the MIDI input device, set tempo, time signature, and transposition (default: `bb_tenor`).
+4. Click **REC MIDI**. After the count-in, play. Click **STOP** when done.
+5. Notation renders inline. Edit notes in the piano roll. Download as MusicXML or PDF.
+6. Alternatively, use **REC AUDIO** to record from a microphone, or **IMPORT** an audio file.
 
 ## Transposition
 - `concert` — concert pitch
@@ -46,6 +50,8 @@ npm run dev   # http://localhost:5173
 The YDS-150 transmits concert MIDI by default; the app shifts pitches to written for the chosen instrument.
 
 ## Notes / Limitations
-- Quantization is fixed to a 16th-note grid; complex rhythms may snap awkwardly.
+- Web MIDI API requires Chrome or Edge (Firefox and Safari don't support it yet).
+- Quantization uses IOI-based articulation gap detection for wind instruments — tongued notes are handled intelligently.
 - Single-line monophonic capture works best. Overlapping notes are clipped, not turned into chords.
-- PDF rendering depends on MuseScore/LilyPond being installed and configured for music21.
+- PDF export depends on MuseScore/LilyPond being installed on the backend.
+- Render free tier spins down after inactivity; first request may take ~30s.

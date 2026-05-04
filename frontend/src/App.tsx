@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { Metronome } from "./metronome";
 import { PianoRoll, PRNote } from "./PianoRoll";
+import { listMidiInputs, initMidi, WebMidiRecorder } from "./webmidi";
 
 type Phase = "idle" | "recording" | "recording-audio" | "stopped";
 
@@ -37,23 +38,23 @@ export function App() {
   const gridSnap = GRID_OPTIONS.find((g) => g.value === gridKey)?.snap ?? 0.25;
 
   const metroRef = useRef(new Metronome());
+  const midiRecRef = useRef(new WebMidiRecorder());
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
   const scoreDivRef = useRef<HTMLDivElement | null>(null);
   const mediaRecRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const rawEventsRef = useRef<{ pitch: number; velocity: number; start: number; duration: number }[]>([]);
 
   useEffect(() => {
-    fetch(`${API}/api/devices`)
-      .then((r) => r.json())
-      .then((d) => {
-        setDevices(d.inputs);
-        if (d.inputs[0]) setDevice(d.inputs[0]);
-      })
-      .catch(() => setError("Backend not reachable. Start the FastAPI server."));
+    initMidi().then(() => listMidiInputs()).then((inputs) => {
+      setDevices(inputs);
+      if (inputs[0]) setDevice(inputs[0]);
+    }).catch(() => {});
     fetch(`${API}/api/transpositions`)
       .then((r) => r.json())
-      .then((d) => setTranspositions(d.options));
+      .then((d) => setTranspositions(d.options))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -67,8 +68,9 @@ export function App() {
   }, []);
 
   const refreshDevices = async () => {
-    const d = await fetch(`${API}/api/devices`).then((r) => r.json());
-    setDevices(d.inputs);
+    const inputs = await listMidiInputs();
+    setDevices(inputs);
+    if (inputs.length > 0 && !inputs.includes(device)) setDevice(inputs[0]);
   };
 
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -87,12 +89,8 @@ export function App() {
       if (metroOn) m.start();
       if (countIn) await wait((60 / tempo) * 1000 * m.beatsPerBar);
 
-      const res = await fetch(`${API}/api/record/start`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ port_name: device || null, tempo_bpm: tempo, debounce_ms: debounceMs }),
-      });
-      if (!res.ok) throw new Error((await res.json()).detail || "Failed to start");
+      midiRecRef.current.onNoteCount = (c) => setNoteCount(c);
+      midiRecRef.current.start(device, debounceMs / 1000);
       setPhase("recording");
     } catch (e: any) {
       metroRef.current.stop();
@@ -111,11 +109,17 @@ export function App() {
     setBusy(true);
     metroRef.current.stop();
     try {
-      const res = await fetch(`${API}/api/record/stop`, { method: "POST" });
-      if (!res.ok) throw new Error((await res.json()).detail || "Failed to stop");
+      const events = midiRecRef.current.stop();
+      rawEventsRef.current = events;
+      const res = await fetch(`${API}/api/quantize`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ events, tempo_bpm: tempo, grid: gridKey }),
+      });
+      if (!res.ok) throw new Error((await res.json()).detail || "Quantization failed");
       const data = await res.json();
       setPhase("stopped");
-      setNoteCount(data.note_count);
+      setNoteCount(events.length);
       updateNotes(data.quantized);
       await renderScore(data.quantized);
     } catch (e: any) {
@@ -186,12 +190,12 @@ export function App() {
 
   const handleRequantize = async (newGrid: string) => {
     setGridKey(newGrid);
-    if (phase !== "stopped") return;
+    if (phase !== "stopped" || rawEventsRef.current.length === 0) return;
     try {
-      const res = await fetch(`${API}/api/requantize`, {
+      const res = await fetch(`${API}/api/quantize`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ grid: newGrid, tempo_bpm: tempo }),
+        body: JSON.stringify({ events: rawEventsRef.current, tempo_bpm: tempo, grid: newGrid }),
       });
       if (!res.ok) return;
       const data = await res.json();
