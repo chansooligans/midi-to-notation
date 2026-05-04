@@ -309,14 +309,8 @@ export function App() {
 
   return (
     <div className="app">
-      {/* ── Top bar ── */}
-      <div className="app-header">
-        <h1>MIDI → Notation</h1>
-        <span className="subtitle">YDS-150</span>
-      </div>
-
       {/* ── Transport bar ── */}
-      <div className="panel" style={{ margin: "0 10px 0", borderRadius: 0, borderTop: "none", padding: "8px 14px" }}>
+      <div className="transport">
         <div className="row">
           {phase !== "recording" && phase !== "recording-audio" ? (
             <>

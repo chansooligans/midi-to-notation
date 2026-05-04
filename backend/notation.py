@@ -24,6 +24,18 @@ TRANSPOSITIONS = {
     "eb_baritone": 21,
 }
 
+STANDARD_DURATIONS = [
+    Fraction(4),      # whole
+    Fraction(3),      # dotted half
+    Fraction(2),      # half
+    Fraction(3, 2),   # dotted quarter
+    Fraction(1),      # quarter
+    Fraction(3, 4),   # dotted eighth
+    Fraction(1, 2),   # eighth
+    Fraction(1, 4),   # sixteenth
+    Fraction(1, 8),   # thirty-second
+]
+
 
 @dataclass
 class QuantizedNote:
@@ -38,6 +50,29 @@ def _snap(value: float, grid: Fraction) -> Fraction:
     return Fraction(steps) * grid
 
 
+def _snap_to_beat(value: float, grid: Fraction) -> Fraction:
+    """Snap to grid, but prefer beat boundaries when close."""
+    grid_snapped = _snap(value, grid)
+    nearest_beat = Fraction(round(value))
+    if abs(float(grid_snapped) - float(nearest_beat)) <= float(grid):
+        return nearest_beat
+    return grid_snapped
+
+
+def _round_duration(dur: Fraction, grid: Fraction) -> Fraction:
+    """Round a duration to the nearest standard note value."""
+    best = grid
+    best_dist = abs(dur - grid)
+    for std in STANDARD_DURATIONS:
+        if std < grid:
+            continue
+        dist = abs(dur - std)
+        if dist < best_dist:
+            best = std
+            best_dist = dist
+    return best
+
+
 def quantize_events(
     events: Iterable[NoteEvent],
     tempo_bpm: float,
@@ -47,8 +82,11 @@ def quantize_events(
 
     quantized = []
     for ev in events:
-        start = _snap(ev.start / sec_per_quarter, grid)
-        dur = _snap(ev.duration / sec_per_quarter, grid)
+        start_q = ev.start / sec_per_quarter
+        dur_q = ev.duration / sec_per_quarter
+
+        start = _snap_to_beat(start_q, grid)
+        dur = _round_duration(_snap(dur_q, grid), grid)
         if dur < grid:
             dur = grid
         quantized.append(QuantizedNote(
@@ -56,6 +94,17 @@ def quantize_events(
         ))
 
     quantized.sort(key=lambda n: (n.start, n.pitch))
+
+    # Filter micro-notes: absorb very short notes into neighbors
+    filtered = []
+    for qn in quantized:
+        if qn.duration <= grid and filtered:
+            prev = filtered[-1]
+            if prev.pitch == qn.pitch and qn.start <= prev.start + prev.duration:
+                prev.duration = max(prev.start + prev.duration, qn.start + qn.duration) - prev.start
+                continue
+        filtered.append(qn)
+    quantized = filtered
 
     # Merge same-pitch notes that truly overlap (not merely adjacent)
     merged: list[QuantizedNote] = []
@@ -77,6 +126,10 @@ def quantize_events(
         if max_dur > 0 and cur.duration > max_dur:
             cur.duration = max_dur
 
+    # Re-round clipped durations to standard values
+    for qn in quantized:
+        qn.duration = _round_duration(qn.duration, grid)
+
     quantized = [n for n in quantized if n.duration > 0]
     return quantized
 
@@ -91,6 +144,9 @@ def quantized_to_score(
     notes = sorted(notes, key=lambda n: (n.start, n.pitch))
     semitone_shift = TRANSPOSITIONS.get(transposition, 0)
 
+    ts = meter.TimeSignature(time_sig)
+    bar_len = Fraction(ts.barDuration.quarterLength).limit_denominator(16)
+
     score = stream.Score()
     score.metadata = metadata.Metadata()
     score.metadata.title = title
@@ -99,16 +155,14 @@ def quantized_to_score(
     part.insert(0, instrument.Saxophone())
     part.insert(0, clef.TrebleClef())
     part.insert(0, tempo.MetronomeMark(number=tempo_bpm))
-    part.insert(0, meter.TimeSignature(time_sig))
+    part.insert(0, ts)
     part.insert(0, key.KeySignature(0))
 
     cursor = Fraction(0)
     for qn in notes:
         if qn.start > cursor:
             rest_len = qn.start - cursor
-            r = note.Rest()
-            r.duration = duration.Duration(quarterLength=float(rest_len))
-            part.append(r)
+            _append_split_rests(part, cursor, rest_len, bar_len)
             cursor = qn.start
 
         n = note.Note()
@@ -120,7 +174,29 @@ def quantized_to_score(
 
     score.append(part)
     score.makeMeasures(inPlace=True)
+    part.makeBeams(inPlace=True)
+
     return score
+
+
+def _append_split_rests(
+    part: stream.Part, offset: Fraction, total: Fraction, bar_len: Fraction
+) -> None:
+    """Split a rest into idiomatic pieces at beat and bar boundaries."""
+    remaining = total
+    pos = offset
+    while remaining > 0:
+        bar_pos = pos % bar_len
+        to_bar_end = bar_len - bar_pos
+        chunk = min(remaining, to_bar_end)
+        chunk = _round_duration(chunk, Fraction(1, 4))
+        if chunk <= 0:
+            chunk = remaining
+        r = note.Rest()
+        r.duration = duration.Duration(quarterLength=float(chunk))
+        part.append(r)
+        pos += chunk
+        remaining -= chunk
 
 
 def events_to_score(
