@@ -95,6 +95,17 @@ def quantize_events(
 
     quantized.sort(key=lambda n: (n.start, n.pitch))
 
+    # Close articulation gaps using IOI analysis: if the silence between
+    # notes is small relative to the onset spacing, it's a tonguing artifact
+    # rather than an intentional rest.
+    for i in range(len(quantized) - 1):
+        cur = quantized[i]
+        nxt = quantized[i + 1]
+        ioi = nxt.start - cur.start
+        gap = ioi - cur.duration
+        if ioi > 0 and Fraction(0) < gap and gap < ioi * Fraction(2, 5):
+            cur.duration = _round_duration(ioi, grid)
+
     # Filter micro-notes: absorb very short notes into neighbors
     filtered = []
     for qn in quantized:
@@ -174,9 +185,36 @@ def quantized_to_score(
 
     score.append(part)
     score.makeMeasures(inPlace=True)
-    part.makeBeams(inPlace=True)
+
+    p = score.parts[0]
+    p.makeTies(inPlace=True)
+    p.makeAccidentals(inPlace=True)
+    p.makeBeams(inPlace=True)
 
     return score
+
+
+SIMPLE_REST_VALUES = [
+    Fraction(4),      # whole
+    Fraction(2),      # half
+    Fraction(1),      # quarter
+    Fraction(1, 2),   # eighth
+    Fraction(1, 4),   # sixteenth
+    Fraction(1, 8),   # thirty-second
+]
+
+
+def _decompose_rest(total: Fraction) -> list[Fraction]:
+    """Break a rest into simple (undotted) values, largest first."""
+    pieces: list[Fraction] = []
+    remaining = total
+    for std in SIMPLE_REST_VALUES:
+        while remaining >= std:
+            pieces.append(std)
+            remaining -= std
+    if remaining > 0:
+        pieces.append(remaining)
+    return pieces
 
 
 def _append_split_rests(
@@ -188,13 +226,16 @@ def _append_split_rests(
     while remaining > 0:
         bar_pos = pos % bar_len
         to_bar_end = bar_len - bar_pos
-        chunk = min(remaining, to_bar_end)
-        chunk = _round_duration(chunk, Fraction(1, 4))
+        to_beat = Fraction(1) - (pos % Fraction(1)) if pos % Fraction(1) else Fraction(1)
+        chunk = min(remaining, to_bar_end, to_beat)
         if chunk <= 0:
             chunk = remaining
-        r = note.Rest()
-        r.duration = duration.Duration(quarterLength=float(chunk))
-        part.append(r)
+
+        for piece in _decompose_rest(chunk):
+            r = note.Rest()
+            r.duration = duration.Duration(quarterLength=float(piece))
+            part.append(r)
+
         pos += chunk
         remaining -= chunk
 
