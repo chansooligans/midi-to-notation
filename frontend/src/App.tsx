@@ -5,6 +5,8 @@ import { PianoRoll, PRNote } from "./PianoRoll";
 
 type Phase = "idle" | "recording" | "recording-audio" | "stopped";
 
+const API = import.meta.env.PROD ? "https://midi-to-notation-api.onrender.com" : "";
+
 const GRID_OPTIONS = [
   { label: "Quarter", value: "1", snap: 1.0 },
   { label: "8th", value: "1/2", snap: 0.5 },
@@ -42,14 +44,14 @@ export function App() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    fetch("/api/devices")
+    fetch(`${API}/api/devices`)
       .then((r) => r.json())
       .then((d) => {
         setDevices(d.inputs);
         if (d.inputs[0]) setDevice(d.inputs[0]);
       })
       .catch(() => setError("Backend not reachable. Start the FastAPI server."));
-    fetch("/api/transpositions")
+    fetch(`${API}/api/transpositions`)
       .then((r) => r.json())
       .then((d) => setTranspositions(d.options));
   }, []);
@@ -65,7 +67,7 @@ export function App() {
   }, []);
 
   const refreshDevices = async () => {
-    const d = await fetch("/api/devices").then((r) => r.json());
+    const d = await fetch(`${API}/api/devices`).then((r) => r.json());
     setDevices(d.inputs);
   };
 
@@ -85,7 +87,7 @@ export function App() {
       if (metroOn) m.start();
       if (countIn) await wait((60 / tempo) * 1000 * m.beatsPerBar);
 
-      const res = await fetch("/api/record/start", {
+      const res = await fetch(`${API}/api/record/start`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ port_name: device || null, tempo_bpm: tempo, debounce_ms: debounceMs }),
@@ -109,7 +111,7 @@ export function App() {
     setBusy(true);
     metroRef.current.stop();
     try {
-      const res = await fetch("/api/record/stop", { method: "POST" });
+      const res = await fetch(`${API}/api/record/stop`, { method: "POST" });
       if (!res.ok) throw new Error((await res.json()).detail || "Failed to stop");
       const data = await res.json();
       setPhase("stopped");
@@ -133,7 +135,7 @@ export function App() {
   const renderScore = async (notesOverride?: PRNote[]) => {
     const notes = notesOverride ?? qNotesRef.current;
     try {
-      const res = await fetch("/api/export/musicxml", {
+      const res = await fetch(`${API}/api/export/musicxml`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -160,7 +162,7 @@ export function App() {
   const downloadFile = async (kind: "musicxml" | "pdf") => {
     setError(null);
     const notes = qNotesRef.current;
-    const res = await fetch(`/api/export/${kind}`, {
+    const res = await fetch(`${API}/api/export/${kind}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -186,7 +188,7 @@ export function App() {
     setGridKey(newGrid);
     if (phase !== "stopped") return;
     try {
-      const res = await fetch("/api/requantize", {
+      const res = await fetch(`${API}/api/requantize`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ grid: newGrid, tempo_bpm: tempo }),
@@ -231,7 +233,7 @@ export function App() {
       fd.append("audio", wav, "recording.wav");
       fd.append("tempo_bpm", String(tempo));
       fd.append("grid", gridKey);
-      const res = await fetch("/api/audio/convert", { method: "POST", body: fd });
+      const res = await fetch(`${API}/api/audio/convert`, { method: "POST", body: fd });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
         throw new Error(err.detail || "Audio conversion failed");

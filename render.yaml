@@ -9,3 +9,14 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+  - type: web
+    name: midi-to-notation
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    plan: free
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
